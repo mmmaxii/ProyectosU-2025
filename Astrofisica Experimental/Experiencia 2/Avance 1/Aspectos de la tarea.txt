@@ -1,0 +1,7 @@
+Poder determinar cual es la mejor señal a ruido para el caso donde calculemos el momentum a orden no se que.    
+
+A veces esta bien mostrar un poco de ruido.
+
+deconvolucion gaussiana para el ruido? investigar
+
+Puedo ver mi redshift y ver cual deberia ser mi longitud de onda "corrida"
