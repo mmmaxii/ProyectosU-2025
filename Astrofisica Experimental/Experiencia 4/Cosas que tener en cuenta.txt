@@ -1,0 +1,106 @@
+Sabemos que dentro de cada archivo tenemos datos de 
+
+Group: Tiene que ver con toda la materia oscura y todo lo macro por asi decirlo
+
+Subhalos: Galaxias en si.
+
+
+El ML no fue concreto, tuve un learnig de 0 practicamente pero es por como se definio el jellyfish, se supone que tendira que ver con el id y asi, pero no se cual es ese y 
+como definirlo.
+
+
+
+✅ 4. Predicción de SFR con Random Forest Regressor
+Importante antes de empezar
+
+Para predecir SFR:
+
+Nadie usa datos balanceados acá
+El “desbalance” es solo para clasificación.
+En regresión no hay clases → no existe ese problema.
+
+Puedes usar el df_clean completo (sin eliminar SFR=0).
+Aunque probablemente vas a querer filtrar solo los que tienen SFR>0 para un modelo más estable.
+Tu decides después.
+
+✅ 4a) Identificar los parámetros del RandomForestRegressor
+
+Estos son los más relevantes:
+
+n_estimators
+Cantidad de árboles. Más árboles = mejor estabilidad, pero más RAM y tiempo.
+
+max_depth
+Profundidad máxima.
+Si es None → crece hasta que no pueda más.
+Controla overfitting.
+
+min_samples_split
+Mínimo de muestras para dividir un nodo.
+Afecta complejidad del modelo.
+
+min_samples_leaf
+Mínimo de muestras en una hoja.
+Evita ramas muy específicas.
+
+max_features
+Cuántas features usar en cada split.
+Valores útiles: "sqrt", "log2", 0.8, etc.
+
+bootstrap
+Submuestras con reemplazo (por defecto True).
+
+✅ 4b) Elegir la métrica para optimizar
+
+En regresión NO usamos F1 ni Accuracy.
+Las métricas típicas son:
+
+MSE
+
+RMSE
+
+MAE
+
+R²
+
+El estándar en ML regresión es optimizar MSE o RMSE.
+
+YO TE RECOMIENDO:
+✅ Usar RMSE como métrica final
+✅ Y usar neg_mean_squared_error como scorer del GridSearch
+
+Porque scikit-learn siempre “maximiza”, así que usamos el negativo de MSE.
+
+
+
+
+Para la parte de randomforest vs RN:
+
+1. La naturaleza de los datos: "Cortes" vs. "Curvas"Random Forest (Lógica de Regímenes):El RF funciona haciendo preguntas 
+de sí/no ("cortes"): ¿Tiene esta galaxia una masa de gas > X? ¿Tiene un agujero negro > Y?La física de galaxias funciona mucho 
+por "regímenes". Por ejemplo: "Si el agujero negro supera cierta masa $\to$ Se activa el Feedback $\to$ La SFR cae de golpe".
+El Random Forest es excelente detectando estos umbrales o escalones físicos.Red Neuronal (Aproximación Suave):La NN intenta 
+ajustar una función matemática continua y suave (curvas) a través de todo el espacio. A veces, la física tiene cambios bruscos 
+que a la red le cuesta modelar sin crear "ruido" o oscilaciones (lo que ves como la nube azul dispersa).2. El manejo del "Ruido"
+ en bajos valores (Low SFR)Mira la esquina inferior izquierda de tus gráficos (Log SFR entre -5 y -3):Imagen Izquierda (NN): 
+ La nube azul es "gorda". La red se confunde mucho ahí. Imagen Derecha (RF): La nube verde es mucho más fina y 
+ pegada a la línea roja.Explicación: En galaxias con muy poca formación estelar, los datos suelen ser más ruidosos o estar 
+ dominados por efectos sutiles. El Random Forest, al promediar la opinión de 100 árboles distintos, cancela el ruido de manera 
+ muy efectiva. La Red Neuronal, al tratar de minimizar el error global, a veces se "sobre-ajusta" al ruido de esas galaxias 
+ pequeñas, dispersando la predicción.3. Datos Tabulares vs. Datos No EstructuradosLas Redes Neuronales brillan en datos no 
+ estructurados (imágenes de píxeles, audio, texto) donde hay que encontrar patrones espaciales complejos.Los Random Forests 
+ (y Gradient Boosting) dominan en datos tabulares (columnas con significado físico claro: Masa, Metalicidad, etc.), que es
+  exactamente lo que tienes tú.Resumen para tu Conclusión de TesisTienes una historia perfecta para contar en tus conclusiones:
+  Para Clasificación (Jellyfish vs Normal): Ganó la Red Neuronal.Por qué: Detectar una Jellyfish es un problema sutil,
+   de patrones complejos y desbalance extremo. La red neuronal fue capaz de captar esa "señal débil" mejor que los cortes 
+   rígidos del bosque.Para Regresión (Predecir SFR): Ganó el Random Forest.Por qué: La relación entre Masa, Gas y SFR sigue 
+   leyes de escala y umbrales físicos que los árboles de decisión modelan con extrema precisión y robustez, superando la 
+   complejidad innecesaria de la red neuronal para esta tarea específica.
+
+
+
+"Se realizó una optimización exhaustiva de hiperparámetros para la Red Neuronal (variando capas, neuronas, 
+   batch size y regularización). A pesar de estos esfuerzos, el modelo de Random Forest mantuvo consistentemente un desempeño superior 
+($R^2 \approx 0.94$ vs $0.92$) y una eficiencia computacional significativamente mayor.Esto sugiere que la superficie de decisión de
+las propiedades galácticas en TNG se modela mejor mediante particiones rectangulares (árboles de decisión) que mediante aproximaciones
+ de funciones continuas (redes neuronales), probablemente debido a la existencia de umbrales físicos críticos en la formación estelar."

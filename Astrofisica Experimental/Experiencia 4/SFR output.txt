@@ -1,0 +1,175 @@
+============================================================
+ANÁLISIS EXPLORATORIO - Distribución de SFR
+============================================================
+
+Dataset original: 5,688,042 galaxias
+Features totales: 26
+
+--- Estadísticas SFR ---
+count    5.688042e+06
+mean     6.036019e-04
+std      6.771741e-02
+min      0.000000e+00
+25%      0.000000e+00
+50%      0.000000e+00
+75%      0.000000e+00
+max      6.941917e+01
+Name: SubhaloSFR, dtype: float64
+
+============================================================
+LIMPIEZA DE FEATURES (Leakage + Radios)
+============================================================
+
+⚠️  Eliminando 12 columnas de Radios ('rad').
+⚠️  Eliminando 5 columnas de Leakage ('sfr').
+⚠️  Total columnas a eliminar: 15
+
+⚠️  Advertencia: Columnas restantes potencialmente relacionadas:
+  - SubhaloStarMetallicity
+
+Shape final post-limpieza: (5688042, 11)
+
+============================================================
+SAMPLING DEL DATASET
+============================================================
+
+→ Usando solo galaxias con SFR > 0: 17,553
+Dataset final para regresión: 17,553
+Features predictores: 10
+
+Skewness de SFR: 26.41
+→ SFR muy sesgado, aplicando transformación log10
+
+Train: 14,042 muestras
+Test:  3,511 muestras
+
+============================================================
+CONFIGURACIÓN GRID SEARCH
+============================================================
+Combinaciones a probar: 24
+
+============================================================
+ENTRENAMIENTO (Esto puede tardar unos minutos...)
+============================================================
+Fitting 3 folds for each of 24 candidates, totalling 72 fits
+
+============================================================
+RESULTADOS
+============================================================
+MEJORES HIPERPARÁMETROS:
+  max_depth: None
+  max_features: sqrt
+  min_samples_leaf: 1
+  n_estimators: 200
+
+--- Evaluación Final (Escala Real) ---
+R²:   0.4759
+RMSE: 0.9756 M_sun/yr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Y ESTE ES OTROOOOOOOOOOOOOOOOO
+
+
+============================================================
+LIMPIEZA DE FEATURES - Eliminar leakage de SFR
+============================================================
+
+Eliminando 3 columnas relacionadas con SFR:
+  - SubhaloSFRinRad
+  - SubhaloSFRinHalfRad
+  - SubhaloSFRinMaxRad
+
+⚠️  Columnas potencialmente relacionadas con formación estelar:
+  - SubhaloStarMetallicity
+  - SubhaloStarMetallicityHalfRad
+  - SubhaloStarMetallicityMaxRad
+Considera si estas features causan leakage
+
+Shape final: (5688042, 23)
+
+============================================================
+SAMPLING DEL DATASET
+============================================================
+
+Opciones de sampling:
+A) Solo galaxias con SFR > 0 (predecir intensidad de formación)
+B) Todas las galaxias (predecir SFR incluyendo ceros)
+
+→ Usando solo galaxias con SFR > 0: 17,553
+Dataset final para regresión: 17,553
+Features: 22
+
+Skewness de SFR: 26.41
+→ SFR muy sesgado, considerar transformación log
+→ Aplicando log10(SFR) como target
+
+Train: 14,042 muestras
+Test:  3,511 muestras
+SFR train - min: -4.9291, max: 1.8415, mean: -2.2949
+SFR test  - min: -4.9180, max: 1.7103, mean: -2.2999
+
+============================================================
+CONFIGURACIÓN GRID SEARCH
+============================================================
+Combinaciones: 324
+
+============================================================
+ENTRENAMIENTO
+============================================================
+Fitting 5 folds for each of 324 candidates, totalling 1620 fits
+
+============================================================
+MEJORES HIPERPARÁMETROS
+============================================================
+  max_depth: 40
+  max_features: 0.5
+  min_samples_leaf: 1
+  min_samples_split: 2
+  n_estimators: 300
+
+Mejor score (neg-MSE): -0.112046
+
+--- Top 5 configuraciones ---
+     rank_test_score  mean_test_score  std_test_score                                                                                                        params
+191                1        -0.112046        0.005069    {'max_depth': 40, 'max_features': 0.5, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}
+272                1        -0.112046        0.005069  {'max_depth': None, 'max_features': 0.5, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}
+110                3        -0.112076        0.005091    {'max_depth': 25, 'max_features': 0.5, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}
+109                4        -0.112239        0.005156    {'max_depth': 25, 'max_features': 0.5, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 200}
+113                5        -0.112424        0.004934    {'max_depth': 25, 'max_features': 0.5, 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 300}
+
+============================================================
+EVALUACIÓN EN TEST
+============================================================
+
+--- Train Set ---
+RMSE:  0.367456
+MAE:   0.036304
+R²:    0.900406
+MAPE:  21.62%
+
+--- Test Set ---
+RMSE:  0.927965
+MAE:   0.093161
+R²:    0.525755
+MAPE:  89.39%
+
+>>> OOB Score: 0.942335 <<<
+
+--- Diagnóstico de Overfitting ---
+R² Train: 0.9004
+R² Test:  0.5258
+Diferencia: 0.3747
+⚠️  Posible overfitting (diferencia > 0.1)
